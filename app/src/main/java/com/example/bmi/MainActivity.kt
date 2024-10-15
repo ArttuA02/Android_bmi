@@ -1,5 +1,6 @@
 package com.example.bmi
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -25,30 +26,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.hrlimits.BmiViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             BmiTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    Bmi()
-                }
+                Bmi()
             }
         }
     }
 }
 
+@SuppressLint("DefaultLocale")
 @Composable
-fun Bmi() {
-    var heightInput by remember { mutableStateOf("") }
-    var weightInput by remember { mutableStateOf("") }
-    val height = heightInput.toFloatOrNull() ?: 0.0f
-    val weight = weightInput.toFloatOrNull() ?: 0.0f
-    val bmi = if (weight > 0 && height > 0) weight / (height * height) else 0.0f
+fun Bmi(bmiViewModel: BmiViewModel = viewModel()) {
 
     Column {
         Text(
@@ -61,23 +55,23 @@ fun Bmi() {
                 .padding(top = 16.dp, bottom = 16.dp)
         )
         OutlinedTextField(
-            value = heightInput,
-            onValueChange = { heightInput = it.replace(',', '.') }, // Ensure proper decimal format
+            value = bmiViewModel.heightInput,
+            onValueChange = { bmiViewModel.changeHeightInput(it.replace(',', '.'))},
             label = { Text(text = stringResource(R.string.height)) },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth()
         )
         OutlinedTextField(
-            value = weightInput,
-            onValueChange = { weightInput = it.replace(',', '.') }, // Ensure proper decimal format
+            value = bmiViewModel.weightInput,
+            onValueChange = { bmiViewModel.changeWeightInput(it.replace(',', '.'))},
             label = { Text(text = stringResource(R.string.weight)) },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth()
         )
             Text(
-                text = stringResource(R.string.result, String.format("%.2f", bmi).replace(',','.')),
+                text = stringResource(R.string.result, String.format("%.2f", bmiViewModel.bmi).replace(',','.')),
                 fontSize = 18.sp,
                 modifier = Modifier.padding(top = 16.dp)
             )
